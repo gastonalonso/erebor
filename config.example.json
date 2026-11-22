@@ -1,0 +1,46 @@
+{
+  "vault": "~/Vaults/work",
+  "claude_bin": "",
+  "model": "",
+  "initial_lookback_days": 3,
+  "max_lookback_days": 7,
+  "exclusions": [
+    "HR, compensation, and performance-review discussions",
+    "Interviews and candidate discussions",
+    "Personal or medical matters"
+  ],
+  "seed_topics": [],
+  "sources": {
+    "fellow": {
+      "enabled": true,
+      "skip_one_on_ones": true
+    },
+    "linear": {
+      "enabled": true,
+      "teams": []
+    },
+    "slack": {
+      "enabled": false,
+      "include_dms": true,
+      "channels": []
+    },
+    "calendar": {
+      "enabled": false,
+      "days_ahead": 14
+    },
+    "gmail": {
+      "enabled": false,
+      "label": "knowledge"
+    },
+    "github": {
+      "enabled": false,
+      "repos": [
+        "example-org/app",
+        "example-org/web",
+        "example-org/api",
+        "example-org/ios",
+        "example-org/components"
+      ]
+    }
+  }
+}

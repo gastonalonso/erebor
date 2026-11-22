@@ -1,0 +1,77 @@
+{
+  "fellow": {
+    "label": "Fellow meetings",
+    "tools": [
+      "mcp__claude_ai_Fellow_ai__search_meetings",
+      "mcp__claude_ai_Fellow_ai__get_meeting_summary",
+      "mcp__claude_ai_Fellow_ai__get_meeting_transcript",
+      "mcp__claude_ai_Fellow_ai__get_meeting_participants",
+      "mcp__claude_ai_Fellow_ai__get_action_items"
+    ],
+    "instructions": "Meetings that started at or after `since`. Never search a wider window: a 7-day search returns ~50k characters and overflows. Start from get_meeting_summary; fetch the transcript only when the summary touches a known topic or area and you need the reasoning, objections, or exact wording behind a decision or constraint. If `skip_one_on_ones` is true, skip meetings with exactly two participants or titled like '1:1', '1-1', '<>' or 'one on one' (count them as skipped). Action items with more than 10 assignees are all-hands broadcasts: ignore them. Source note path: sources/fellow/YYYY-MM-DD-<meeting-slug>.md."
+  },
+  "linear": {
+    "label": "Linear issues",
+    "tools": [
+      "mcp__claude_ai_Linear__whoami",
+      "mcp__claude_ai_Linear__list_teams",
+      "mcp__claude_ai_Linear__get_team",
+      "mcp__claude_ai_Linear__list_issues",
+      "mcp__claude_ai_Linear__get_issue",
+      "mcp__claude_ai_Linear__list_comments",
+      "mcp__claude_ai_Linear__list_issue_statuses",
+      "mcp__claude_ai_Linear__list_projects",
+      "mcp__claude_ai_Linear__get_project",
+      "mcp__claude_ai_Linear__get_status_updates",
+      "mcp__claude_ai_Linear__list_milestones",
+      "mcp__claude_ai_Linear__get_milestone",
+      "mcp__claude_ai_Linear__list_documents",
+      "mcp__claude_ai_Linear__get_document",
+      "mcp__claude_ai_Linear__get_user"
+    ],
+    "instructions": "Issues assigned to me or created by me that were updated at or after `since` (Linear has no subscriber/watching filter, so assigned + created-by is the approximation). If `teams` is non-empty, only those team keys. One source note per issue at sources/linear/<IDENTIFIER>.md. When the note already exists, append a dated entry under '## Updates' only for meaningful changes: decisions or constraints in comments, scope changes, blockers, state transitions that end or start work. Ignore pure status churn and bot comments."
+  },
+  "slack": {
+    "label": "Slack (DMs, threads I'm in, chosen channels)",
+    "tools": [
+      "mcp__claude_ai_Slack__slack_search_public_and_private",
+      "mcp__claude_ai_Slack__slack_search_channels",
+      "mcp__claude_ai_Slack__slack_search_users",
+      "mcp__claude_ai_Slack__slack_read_channel",
+      "mcp__claude_ai_Slack__slack_read_thread",
+      "mcp__claude_ai_Slack__slack_read_canvas",
+      "mcp__claude_ai_Slack__slack_read_user_profile",
+      "mcp__claude_ai_Slack__slack_list_user_channels",
+      "mcp__claude_ai_Slack__slack_list_channel_members"
+    ],
+    "instructions": "Capture everything I'm involved in since `since`: my DMs and group DMs (if `include_dms` is true), plus channel threads I posted in or was mentioned in. Also capture every substantive thread in the channels named in `channels`, even without me. Find messages with slack_search_public_and_private using Slack search modifiers (for example `from:me`, `to:me`, mentions of me, `in:#channel`) with `after:` set to the day before `since`; `after:` is day-granular, so drop messages older than `since` yourself. Read whole threads and the surrounding DM messages for context before summarizing. Note granularity: one note per DM or group DM conversation per local day at sources/slack/YYYY-MM-DD-dm-<person-slug>.md (group DMs: YYYY-MM-DD-gdm-<names-slug>.md), source_id `<conversation id>:<YYYY-MM-DD>`; one note per channel thread at sources/slack/YYYY-MM-DD-<channel>-<slug>.md, source_id `<channel id>:<thread ts>`. Include a permalink. If today's note for a conversation or thread already exists, append the new messages' substance under '## Updates'. In DMs, capture asks and promises as action items, both directions: '- [ ] Me \u2014 send Sam the build link' or '- [ ] Sam \u2014 review ENG-562'. When a later message shows an earlier action item is done, tick it in its note. Skip pure chatter, greetings, emoji-only replies, bot and app messages, and link drops with no discussion (count them as skipped). DMs are where excluded subjects come up most: apply the exclusions strictly and write nothing about those messages."
+  },
+  "calendar": {
+    "label": "Google Calendar",
+    "tools": [
+      "mcp__claude_ai_Google_Calendar__list_calendars",
+      "mcp__claude_ai_Google_Calendar__list_events",
+      "mcp__claude_ai_Google_Calendar__get_event",
+      "mcp__claude_ai_Google_Calendar__search_events"
+    ],
+    "instructions": "Events from `since` until `days_ahead` days in the future. Do not write source notes for routine events (standups, 1:1s, focus blocks). Use events only to add upcoming dates, deadlines, and milestones to the Timeline of a topic they clearly relate to; when you do, write a short source note at sources/calendar/YYYY-MM-DD-cal-<event-slug>.md so the timeline entry has something to link to. The `cal-` keeps its name apart from the Fellow note for the same meeting."
+  },
+  "gmail": {
+    "label": "Gmail (labeled threads)",
+    "tools": [
+      "mcp__claude_ai_Gmail__list_labels",
+      "mcp__claude_ai_Gmail__search_threads",
+      "mcp__claude_ai_Gmail__get_thread",
+      "mcp__claude_ai_Gmail__get_message"
+    ],
+    "instructions": "Only threads carrying the Gmail label `label` that have messages at or after `since`. Never read unlabeled mail. One source note per thread at sources/gmail/YYYY-MM-DD-<subject-slug>.md."
+  },
+  "github": {
+    "label": "GitHub pull requests",
+    "tools": [
+      "Bash(gh search prs:*)",
+      "Bash(gh pr view:*)"
+    ],
+    "instructions": "Pull requests in the configured `repos` (owner/name) that involve me (author, reviewer, commenter, mentioned) and were updated at or after `since`. Find them with one search per repo, e.g. `gh search prs --involves @me --repo example-org/app --updated \">=<since>\" --limit 100 --json number,title,url,repository,author,updatedAt,state`. Read each with `gh pr view <number> -R <owner/name> --json title,body,author,state,mergedAt,url,headRefName,reviews,comments,closingIssuesReferences`. Run gh commands one at a time with no pipes or `&&`; use `--jq` to trim output. Skip PRs by bots (dependabot, renovate, github-actions) and ignore bot and Copilot review comments. Capture only PRs with substance: a description that explains why, review discussion with pushback, alternatives or decisions, or a scope change. Count version bumps, typo fixes and other trivial PRs as skipped; a PR with substance is captured even when no topic tracks it. One source note per PR at sources/github/<repo>-<number>.md with source_id `<owner/name>#<number>`. Link the PR to Linear issue notes when its title, branch or body names an issue ID (e.g. ENG-123), and put it on the same topics. When the note already exists, append under '## Updates' only for merges, closes, or new review decisions."
+  }
+}

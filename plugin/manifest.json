@@ -1,0 +1,9 @@
+{
+  "id": "erebor",
+  "name": "Erebor",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Pulls new items from work sources into this vault with Claude, and keeps its index current.",
+  "author": "Gaston Alonso",
+  "isDesktopOnly": true
+}

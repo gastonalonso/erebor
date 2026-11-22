@@ -1,0 +1,17 @@
+{
+  "name": "erebor-plugin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "install-plugin": "node build.mjs --install",
+    "check": "tsc",
+    "test": "node --test \"tests/*.test.ts\""
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "esbuild": "^0.28.2",
+    "obsidian": "^1.14.4",
+    "typescript": "^7.0.2"
+  }
+}
